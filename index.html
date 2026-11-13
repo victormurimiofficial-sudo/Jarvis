@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><meta name="theme-color" content="#101315"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>JARVIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#101315;--pan:#1a1e22;--bez:#2c3238;--hi:#3d454d;--amb:#ffb000;--cy:#4de1ff;--red:#ff4d4d;--ok:#5cff9d;--dim:#7d8a96;--tx:#d9e2ea;
+--d:"Chakra Petch",system-ui,sans-serif;--m:"JetBrains Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg) repeating-linear-gradient(0deg,#0000 0 3px,#ffffff05 3px 4px);color:var(--tx);font:400 15px/1.5 var(--d);min-height:100vh}
+main{max-width:1060px;margin:0 auto;padding:16px}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--bez);background:var(--pan);padding:10px 14px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.bar h1{margin:0;font-size:1.3rem;font-weight:700;letter-spacing:.32em}
+.leds{display:flex;gap:16px;font:400 .75rem var(--m);color:var(--dim)}
+.led::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);margin-right:6px}
+.led.on::before{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.core{display:grid;justify-items:center;gap:14px;padding:26px 0}
+.rig{position:relative;width:230px;height:230px}
+.rig .tick,.rig .ring{position:absolute;border-radius:50%}
+.tick{inset:0;background:repeating-conic-gradient(var(--amb) 0 1.2deg,#0000 1.2deg 6deg);-webkit-mask:radial-gradient(circle,#0000 66%,#000 67% 77%,#0000 78%);mask:radial-gradient(circle,#0000 66%,#000 67% 77%,#0000 78%);animation:spin 40s linear infinite}
+.ring{inset:30px;border:2px dashed var(--cy);opacity:.6;animation:spin 18s linear infinite reverse}
+.ring.b{inset:52px;border:3px solid var(--hi);border-top-color:var(--amb);border-bottom-color:var(--amb);opacity:1;animation-duration:7s}
+.orb{position:absolute;inset:74px;border-radius:50%;border:2px solid var(--cy);background:radial-gradient(circle at 35% 30%,#1d3a44,#0a1417);color:var(--cy);font:700 1.5rem var(--d);letter-spacing:.1em;box-shadow:0 0 22px #4de1ff55 inset}
+.rig.listening .orb{border-color:var(--amb);color:var(--amb);box-shadow:0 0 30px #ffb00088 inset;animation:pulse .9s infinite}
+.rig.speaking .orb{animation:pulse 1.5s infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.tick,.ring,.orb{animation:none!important}}
+#stat{font:400 .8rem var(--m);color:var(--cy);min-height:1.3em;letter-spacing:.06em}
+.cmd{display:flex;gap:8px;width:100%;max-width:600px}
+.cmd input{flex:1;min-width:0;background:#0b0e10;border:1px solid var(--bez);border-left:3px solid var(--amb);padding:11px 12px;font-family:var(--m);font-size:.9rem}
+.k{background:var(--bez);border:1px solid var(--hi);padding:10px 16px;font:700 .8rem var(--d);letter-spacing:.14em;text-transform:uppercase;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.k:hover{background:var(--hi)}.k.go{background:var(--amb);color:#000;border-color:var(--amb)}
+.keys{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#log{width:100%;max-width:600px;display:grid;gap:6px;font-family:var(--m);font-size:.85rem}
+.l{padding:8px 12px;border-left:3px solid var(--cy);background:#0b0e10aa;white-space:pre-wrap}.l.me{border-color:var(--amb);color:var(--dim)}.l.err{border-color:var(--red);color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
+.pan{position:relative;background:var(--pan);border:1px solid var(--bez);padding:16px 16px 12px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
+.pan::before,.pan::after{content:"";position:absolute;top:8px;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8a949e,#2a3036)}
+.pan::before{left:8px}.pan::after{right:26px}
+.pan h2{margin:0 0 8px 14px;display:flex;justify-content:space-between;font-size:.85rem;letter-spacing:.24em}
+.n{font:700 1.4rem var(--m);color:var(--amb);background:#0b0e10;border:1px solid var(--bez);padding:0 10px;min-width:48px;text-align:center}
+ul{list-style:none;margin:0;padding:0}
+li{display:grid;grid-template-columns:70px 1fr;gap:8px;padding:8px 0;border-top:1px dashed var(--bez);font-size:.9rem}
+li .t{font:400 .8rem var(--m);color:var(--cy)}li .t.w{color:var(--amb)}li small{display:block;color:var(--dim)}
+.empty{color:var(--dim);font:400 .85rem var(--m);padding:8px 0}
+.lg{position:fixed;inset:0;z-index:9;background:var(--bg);display:grid;align-content:center;gap:12px;justify-items:center;font-family:var(--m);padding:20px}.lg[hidden]{display:none}.lg input{background:#0b0e10;border:1px solid var(--bez);border-left:3px solid var(--amb);padding:11px 12px;width:min(320px,90vw);font-family:var(--m)}#lerr{color:var(--red);min-height:1.2em}
+main{padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}
+.set{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:16px;font:400 .75rem var(--m);color:var(--dim)}
+.set a{color:var(--amb)}
+</style>
+</head>
+<body>
+<form id="login" class="lg" hidden><b>JARVIS ACCESS</b><input id="pw" type="password" placeholder="password" autocomplete="current-password" aria-label="Password"><button class="k go">Unlock</button><small id="lerr"></small></form>
+<main>
+<div class="bar"><h1>JARVIS</h1><div class="leds"><span class="led" id="lG">GOOGLE</span><span class="led" id="lO">AI</span><span class="led" id="lV">VOICE</span></div></div>
+
+<div class="core">
+  <div class="rig" id="rig"><div class="tick"></div><div class="ring"></div><div class="ring b"></div><button class="orb" id="orb" aria-label="Talk to Jarvis">J</button></div>
+  <div id="stat">STANDBY</div>
+  <form class="cmd" id="f"><input id="txt" placeholder="say or type: good morning" aria-label="Command" autocomplete="off"><button class="k go">Send</button></form>
+  <div class="keys"><button class="k" data-q="good morning">Brief me</button><button class="k" data-q="what is next">Next up</button><button class="k" data-q="read my emails">Read mail</button><button class="k" data-q="stop">Stop</button><button class="k" id="conn" hidden>Connect Google</button></div>
+  <div id="log" aria-live="polite"></div>
+</div>
+
+<div class="grid">
+  <div class="pan"><h2>INBOX / UNREAD <span class="n" id="nM">--</span></h2><ul id="mL"></ul></div>
+  <div class="pan"><h2>SCHEDULE / TODAY <span class="n" id="nE">--</span></h2><ul id="eL"></ul></div>
+</div>
+<div class="set"><label><input type="checkbox" id="hf"> HANDS-FREE (say "Jarvis ...")</label><label><input type="checkbox" id="spk" checked> SPEAK REPLIES</label><label>RATE <input type="range" id="rate" min="0.7" max="1.4" step="0.1" value="1"></label><span id="mdl"></span></div>
+</main>
+
+<script>
+const $=i=>document.getElementById(i);
+let D=null,ST={},speak=true,H=[];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tm=e=>e.allDay?"ALL DAY":new Date(e.start).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const dayR=()=>{const a=new Date();a.setHours(0,0,0,0);const b=new Date(a);b.setDate(b.getDate()+1);return {from:a.toISOString(),to:b.toISOString()}};
+const dayQ=()=>{const a=new Date();a.setHours(0,0,0,0);const b=new Date(a);b.setDate(b.getDate()+1);return "from="+encodeURIComponent(a.toISOString())+"&to="+encodeURIComponent(b.toISOString())};
+const set=(c,t)=>{$("rig").className="rig "+c;$("stat").textContent=t};
+const log=(t,c="")=>{const d=document.createElement("div");d.className="l "+c;d.textContent=t;$("log").appendChild(d);d.scrollIntoView({block:"nearest"})};
+const api=async(u,o)=>{const r=await fetch(u,{...o,headers:{"Content-Type":"application/json","X-Jarvis":"1",...(o&&o.headers)}}),j=await r.json();if(!r.ok)throw new Error(j.error||r.status);return j};
+
+async function status(){
+ try{ST=await api("/api/main?action=status");$("login").hidden=true}catch(e){if(e.message==="login")$("login").hidden=false;else log("SERVER: "+e.message,"err");return}
+ $("lG").classList.toggle("on",ST.google);$("lO").classList.toggle("on",ST.ai);$("lV").classList.toggle("on",!!(window.speechSynthesis));
+ $("conn").hidden=ST.google;
+}
+async function refresh(){
+ if(!ST.google)return;
+ try{D=await api("/api/main?action=data&"+dayQ())}catch(e){log("DATA LINK FAILED: "+e.message,"err");return}
+ $("nM").textContent=D.unread??D.mails.length;$("nE").textContent=D.events.length;
+ $("mL").innerHTML=D.mails.map(m=>`<li><span class="t ${m.days>=2?"w":""}">${m.days>=2?"WAIT "+m.days+"D":m.days?m.days+"D":"NEW"}</span><span><b>${esc(m.from)}</b><small>${esc(m.subject)}</small><small>${esc((m.snippet||"").slice(0,90))}</small></span></li>`).join("")||'<div class="empty">INBOX CLEAR</div>';
+ $("eL").innerHTML=D.events.map(e=>`<li><span class="t">${tm(e)}</span><span>${esc(e.title)}</span></li>`).join("")||'<div class="empty">NO EVENTS TODAY</div>';
+}
+const list=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a.at(-1);
+function brief(){
+ const h=new Date().getHours(),p=[(h<12?"Good morning":h<18?"Good afternoon":"Good evening")+"."];
+ const up=D.events.filter(e=>e.allDay||new Date(e.start)>new Date()),n=D.events.length;
+ p.push(n?`You have ${n} event${n>1?"s":""} today${up[0]?`, next is ${up[0].title}${up[0].allDay?"":" at "+tm(up[0])}`:", all of them already done"}.`:"Your calendar is clear today.");
+ p.push(D.unread?`${D.unread} unread email${D.unread>1?"s":""}.`:"Inbox is clear.");
+ const w=D.mails.filter(m=>m.days>=2);
+ if(w.length)p.push(`${list(w.slice(0,3).map(m=>`${m.from} about ${m.subject}, waiting ${m.days} days`))}.`);
+ return p.join(" ");
+}
+function say(t){
+ log(t);
+ if(!speak||!window.speechSynthesis)return;
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t);u.rate=+$("rate").value;
+ u.onstart=()=>set("speaking","TRANSMITTING");u.onend=u.onerror=()=>set("","STANDBY");
+ speechSynthesis.speak(u);
+}
+const fmt=(a,b)=>{const o={weekday:"short",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"};return new Date(a).toLocaleString([],o)+" to "+new Date(b).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})};
+function confirmCard(a){
+ const d=document.createElement("div");d.className="l";
+ d.textContent=(a.type==="create_event"?"CONFIRM EVENT\n"+a.title+"\n"+fmt(a.start,a.end):"CONFIRM EMAIL\nTo: "+a.to+"\nSubject: "+a.subject+"\n\n"+a.body)+"\n\n";
+ const y=document.createElement("button");y.className="k go";y.textContent=a.type==="create_event"?"Add to calendar":"Send";
+ const n=document.createElement("button");n.className="k";n.textContent="Cancel";
+ y.onclick=async()=>{y.disabled=n.disabled=true;try{const r=await api("/api/main?action=exec",{method:"POST",body:JSON.stringify({token:a.token})});d.remove();say(r.done);refresh()}catch(e){log("ERROR: "+e.message,"err");y.disabled=n.disabled=false}};
+ n.onclick=()=>{d.remove();log("Cancelled.")};
+ d.append(y," ",n);$("log").appendChild(d);d.scrollIntoView({block:"nearest"});
+}
+async function run(q){
+ q=q.trim();if(!q)return;log("> "+q,"me");const l=q.toLowerCase().replace(/[’']/g,"");
+ if(/\b(stop|quiet|cancel)\b/.test(l)){speechSynthesis.cancel();set("","STANDBY");return}
+ if(!ST.google)return log("GOOGLE NOT CONNECTED. Press Connect Google.","err");
+ try{
+  set("listening","THINKING");await refresh();
+  if(ST.ai){
+   try{
+    const r=await api("/api/main?action=chat",{method:"POST",body:JSON.stringify({text:q,history:H.slice(-10),...dayR(),now:new Date().toString(),tz:Intl.DateTimeFormat().resolvedOptions().timeZone})});
+    H.push({role:"user",content:q},{role:"assistant",content:r.say});say(r.say);if(r.action)confirmCard(r.action);return;
+   }catch(e){log("AI unavailable ("+e.message+"). Using basic mode.","err")}
+  }
+  if(/good (morning|afternoon|evening)|briefing|brief me/.test(l))return say(brief());
+  if(/read.*(email|mail)|unread|inbox/.test(l))return say(D.mails.length?"Unread: "+D.mails.slice(0,5).map(m=>`${m.from}, ${m.subject}`).join(". ")+".":"Inbox is clear.");
+  say("Basic mode: I can brief you and read your mail. Add an ANTHROPIC_API_KEY on the server to unlock scheduling, sending, replying and questions.");
+ }catch(e){set("","FAULT");log("ERROR: "+e.message,"err")}
+}
+$("f").onsubmit=e=>{e.preventDefault();run($("txt").value);$("txt").value=""};
+document.querySelectorAll(".k[data-q]").forEach(b=>b.onclick=()=>run(b.dataset.q));
+$("login").onsubmit=async e=>{e.preventDefault();try{await api("/api/main?action=login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("pw").value})});$("pw").value="";$("lerr").textContent="";await status();refresh()}catch(err){$("lerr").textContent=err.message}};
+$("conn").onclick=()=>location.href="/api/main?action=auth";
+$("spk").onchange=e=>speak=e.target.checked;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec,on=false;
+$("orb").onclick=()=>{
+ if(!SR)return log("Voice input needs Chrome or Edge. Type instead.","err");
+ if(hfOn)return log("Hands-free is on. Just say Jarvis and your request.");
+ if(on)return rec.stop();
+ speechSynthesis.cancel();rec=new SR();rec.lang=navigator.language||"en-US";
+ rec.onstart=()=>{on=true;set("listening","LISTENING")};
+ rec.onresult=e=>run(e.results[0][0].transcript);
+ rec.onerror=e=>{on=false;set("","VOICE FAULT");log(e.error==="not-allowed"||e.error==="service-not-allowed"?"MIC BLOCKED. Allow microphone for this site in your browser settings (lock icon in the address bar), then tap the orb again. Typing still works.":"Voice error: "+e.error,"err")};
+ rec.onend=()=>{on=false;if(!$("rig").classList.contains("speaking"))set("","STANDBY")};
+ try{rec.start()}catch{}
+};
+let hf=null,hfOn=false;
+function handsFree(on){
+ if(!SR){log("Hands-free needs Chrome or Edge.","err");$("hf").checked=false;return}
+ hfOn=on;if(!on){hf&&hf.stop();return}
+ hf=new SR();hf.lang=navigator.language||"en-US";hf.continuous=true;hf.interimResults=false;
+ hf.onresult=e=>{const t=e.results[e.results.length-1][0].transcript.trim(),m=t.match(/\bjarvis\b[,.]?\s*(.*)/i);if(m)run(m[1]||"good morning")};
+ hf.onend=()=>{if(hfOn)try{hf.start()}catch{}};
+ hf.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"){hfOn=false;$("hf").checked=false;log("MIC BLOCKED. Allow microphone for this site in your browser settings.","err")}};
+ try{hf.start()}catch{}
+}
+$("hf").onchange=e=>handsFree(e.target.checked);
+status().then(refresh);setInterval(refresh,60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
+</script>
+</body>
+</html>
